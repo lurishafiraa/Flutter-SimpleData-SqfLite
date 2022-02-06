@@ -3,13 +3,18 @@ import 'package:flutter_sqlite/helper/db_helper.dart';
 import 'package:intl/intl.dart';
 
 class CustomerForm extends StatefulWidget {
-  const CustomerForm({Key? key}) : super(key: key);
+  //const CustomerForm({Key? key}) : super(key: key);
+
+  final Map? data;
+
+  CustomerForm({this.data});
 
   @override
-  _CustomerFormState createState() => _CustomerFormState();
+  _CustomerFormState createState() => _CustomerFormState(this.data);
 }
 
 class _CustomerFormState extends State<CustomerForm> {
+  final Map? data;
   late TextEditingController txtID, txtNama, txtTgllahir;
   String gender = '';
 
@@ -37,20 +42,26 @@ class _CustomerFormState extends State<CustomerForm> {
         'gender': gender,
         'tgl_lahir': txtTgllahir.value.text,
       };
-      final id = await _db?.insert('pelanggan', data);
+      final id = this.data == null
+          ? await _db?.insert('pelanggan', data)
+          : await _db?.update('pelanggan', data,
+              where: 'id=?', whereArgs: [this.data!['id']]);
       return id! > 0;
     } catch (e) {}
     return false;
   }
 
-  _CustomerFormState() {
-    txtID = TextEditingController();
-    txtNama = TextEditingController();
-    txtTgllahir = TextEditingController();
+  _CustomerFormState(this.data) {
+    txtID = TextEditingController(text: '${this.data?['id'] ?? ''}');
+    txtNama = TextEditingController(text: this.data?['nama'] ?? '');
+    txtTgllahir = TextEditingController(text: this.data?['tgl_lahir'] ?? '');
+    gender = this.data?['gender'] ?? '';
 
-    lastID().then((value) {
-      txtID.text = '${value + 1}';
-    });
+    if (this.data == null) {
+      lastID().then((value) {
+        txtID.text = '${value + 1}';
+      });
+    }
   }
 
   Widget txtInputID() => TextFormField(
