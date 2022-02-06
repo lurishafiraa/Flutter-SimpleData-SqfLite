@@ -23,6 +23,13 @@ class _CustomerListState extends State<CustomerList> {
     setState(() {});
   }
 
+  Future<bool> hapusData(int id) async {
+    final _db = await DBHelper.db();
+    final count =
+        await _db?.delete('pelanggan', where: 'id=?', whereArgs: [id]);
+    return count! > 0;
+  }
+
   Widget item(Map d) => ListTile(
         onLongPress: () {
           showMenu(
@@ -33,6 +40,10 @@ class _CustomerListState extends State<CustomerList> {
                 PopupMenuItem(
                   child: Text('Sunting data ini'),
                   value: 'S',
+                ),
+                PopupMenuItem(
+                  child: Text('Hapus data ini'),
+                  value: 'H',
                 )
               ]).then((value) {
             if (value == 'S') {
@@ -41,6 +52,27 @@ class _CustomerListState extends State<CustomerList> {
                   .then((value) {
                 if (value == true) refresh();
               });
+            } else if (value == 'H') {
+              showDialog(
+                  context: context,
+                  builder: (c) => AlertDialog(
+                        content: Text('Pelanggan ${d['nama']} ingin dihapus?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                hapusData(d['id']).then((value) {
+                                  if (value == true) refresh();
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Text('Ya, saya yakin banget')),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Nggak jadi deh...')),
+                        ],
+                      ));
             }
           });
         },
