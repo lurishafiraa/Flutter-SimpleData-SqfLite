@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sqlite/helper/db_helper.dart';
+import 'package:flutter_sqlite/pages/pelanggan/pelanggan_cari.dart';
 import 'package:flutter_sqlite/pages/pelanggan/pelanggan_form.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -99,6 +100,15 @@ class _CustomerListState extends State<CustomerList> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Data Pelanggan'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (c) => FindCustomer()));
+            },
+            icon: Icon(Icons.search),
+          )
+        ],
       ),
       floatingActionButton: tambahData(),
       body: SmartRefresher(
